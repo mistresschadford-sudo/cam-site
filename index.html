@@ -74,7 +74,7 @@ body { background-color: #050108; margin: 0; padding: 20px; font-family: 'Courie
     var statusBox = document.querySelector('.hypno-status-box');
     if (!statusBox) return;
 
-    fetch('https://raw.githubusercontent.com/mistresschadford-sudo/cam-site/main/status.txt?_=' + Date.now())
+    fetch('https://raw.githubusercontent.com/mistresschadford-sudo/cam-site/main/status.txt?_=' + Date.now(), { cache: 'no-store' })
       .then(function (response) {
         if (!response.ok) throw new Error('status.txt not found');
         return response.text();
