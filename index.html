@@ -41,7 +41,7 @@ body { background-color: #050108; margin: 0; padding: 20px; font-family: 'Courie
 
 <div class="fade-in-content"> 
   
-  <div class="hypno-status-box offline"> 
+  <div class="hypno-status-box"> 
     <div class="status-header">STATUS</div> 
     <div class="status-body"> 
       <img class="status-pic pic-online" src="tinaprofilesq.png" alt="TinaChadford"> 
@@ -71,17 +71,34 @@ body { background-color: #050108; margin: 0; padding: 20px; font-family: 'Courie
 </div> 
 
 <script>
-  // Sync the embedded form iframe with your online/offline status.
-  // Edit the class on .hypno-status-box (online / offline) as you already do,
-  // and this will automatically pass that state into the form page.
-  (function() {
-    var statusBox = document.querySelector(".hypno-status-box");
-    var formIframe = document.getElementById("session-form-iframe");
-    if (statusBox && formIframe && statusBox.classList.contains("offline")) {
-      formIframe.src = formIframe.src + "?status=offline";
-    }
+  (function () {
+    var statusBox = document.querySelector('.hypno-status-box');
+    if (!statusBox) return;
+
+    fetch('/status.txt?_=' + Date.now())
+      .then(function (response) {
+        if (!response.ok) throw new Error('status.txt not found');
+        return response.text();
+      })
+      .then(function (text) {
+        var lines = text.trim().split('\n');
+        var status = (lines[0] || '').trim().toLowerCase();
+
+        if (status === 'online' || status === 'offline') {
+          statusBox.classList.remove('online', 'offline');
+          statusBox.classList.add(status);
+        }
+
+        // Sync the iframe form with the fetched status, same as before
+        var formIframe = document.getElementById('session-form-iframe');
+        if (formIframe && status === 'offline') {
+          formIframe.src = formIframe.src + '?status=offline';
+        }
+      })
+      .catch(function (err) {
+        console.error('Could not load status:', err);
+      });
   })();
 </script>
-
 </body> 
 </html>
